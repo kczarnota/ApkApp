@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.example.konrad.indoorwayhackathon"
-        minSdkVersion 24
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -21,6 +21,9 @@ android {
             }
         }
     }
+    packagingOptions {
+        pickFirst 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
@@ -31,13 +34,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     // required for map and location modules
-    compile('com.indoorway.android:common:2.0.4')
+    implementation 'com.indoorway.android:common:2.0.4'
     // optional if you don't want to use map view
-    compile('com.indoorway.android:map:2.0.4')
+    implementation 'com.indoorway.android:map:2.0.4'
     // optional if you don't want to use indoor positioning
-    compile('com.indoorway.android:location:2.0.4')
+    implementation 'com.indoorway.android:location:2.0.4'
     // optional if you don't want to use qr codes
-    compile('com.indoorway.android:qrcode:2.0.4')
+    implementation 'com.indoorway.android:qrcode:2.0.4'
     // optional if you don't want to use fragments
-    compile('com.indoorway.android:fragments:2.0.4')
+    implementation 'com.indoorway.android:fragments:2.0.4'
 }
