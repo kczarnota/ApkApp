@@ -8,12 +8,15 @@ import android.os.Looper;
 
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
+import com.indoorway.android.common.sdk.model.RegisteredVisitor;
+import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.common.sdk.task.IndoorwayTask;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,15 +67,13 @@ public class VisitorSyncService extends Service
                     .setOnCompletedListener(new Action1<List<VisitorLocation>>() {
                         @Override
                         public void onAction(List<VisitorLocation> visitorLocations) {
-                            isDownloading.set(false);
-                            onVisitorLocationsFetched(visitorLocations);
+                            getVisitorsNow(visitorLocations);
                         }
                     })
                     .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>() {
                         @Override
                         public void onAction(IndoorwayTask.ProcessingException e) {
                             isDownloading.set(false);
-                            onVisitorLocationsFetchFailed();
                         }
                     }).execute();
         }
@@ -82,19 +83,50 @@ public class VisitorSyncService extends Service
     {
     }
 
-    private void onVisitorLocationsFetched(List<VisitorLocation> visitorLocations)
-    {
-        Map<String, VisitorLocation> map = new HashMap<>();
+    private void getVisitorsNow(List <VisitorLocation> visitorLocations) {
+        final List <VisitorLocation> visitorLocationLinkedList = new LinkedList<>();
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, -5);
+        calendar.add(Calendar.MINUTE, -1);
         Date fiveMinutesAgo = calendar.getTime();
         for (VisitorLocation location : visitorLocations) {
             if (location.getTimestamp() != null && !location.getTimestamp().before(fiveMinutesAgo))
-                map.put(location.getVisitorUuid(), location);
+                visitorLocationLinkedList.add(location);
         }
+        IndoorwaySdk.instance()
+                .visitors()
+                .list()
+                .setOnCompletedListener(new Action1<List<RegisteredVisitor>>() {
+                    @Override
+                    public void onAction(List<RegisteredVisitor> visitors) {
+                        Map<RegisteredVisitor, VisitorLocation> map = new HashMap<>();
+                        isDownloading.set(false);
+                        for (RegisteredVisitor visitor: visitors) {
+/*                            Visitor myself = IndoorwaySdk.instance().visitor().me();
+                            if (visitor.getUuid() == myself.getUuid()) {
+                                continue;
+                            }*/
+                            for (VisitorLocation visitorLocation :visitorLocationLinkedList) {
+                                if (visitor.getUuid().equals(visitorLocation.getVisitorUuid())) {
+                                    map.put(visitor, visitorLocation);
+                                    onVisitorLocationsFetched(map);
+                                }
+                            }
+                        }
+                    }
+                })
+                .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>() {
+                    @Override
+                    public void onAction(IndoorwayTask.ProcessingException e) {
+                        isDownloading.set(false);
+                        onVisitorLocationsFetchFailed();
+                    }
+                }).execute();
 
+    }
+
+    private void onVisitorLocationsFetched(Map<RegisteredVisitor, VisitorLocation> visitorLocations) {
         for (SyncListener listener : listeners) {
-            listener.onSyncCompleted(map);
+            listener.onSyncCompleted(visitorLocations);
         }
     }
 

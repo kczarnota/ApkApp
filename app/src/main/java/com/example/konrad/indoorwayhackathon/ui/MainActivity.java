@@ -24,13 +24,9 @@ import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
-import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 
@@ -51,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
             syncVisitorSeviceHandle.registerListener(new SyncListener()
             {
                 @Override
-                public void onSyncCompleted(Map<String, VisitorLocation> visitorLocations)
+                public void onSyncCompleted(Map<RegisteredVisitor, VisitorLocation> visitorLocations)
                 {
                     if (currentMap == null)
                         return;
@@ -71,21 +67,17 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                         }
                     }).execute();*/
 
-                    for (VisitorLocation location : visitorLocations.values())
+                    for (Map.Entry<RegisteredVisitor, VisitorLocation> visitor: visitorLocations.entrySet())
                     {
+                        VisitorLocation location = visitor.getValue();
+                        RegisteredVisitor v = visitor.getKey();
                         Log.d(TAG, "onSyncCompleted: " + location.toString());
                         IndoorwayPosition position = location.getPosition();
                         if (position != null && position.getMapUuid().equals(currentMap.getMapUuid()))
                         {
- /*                           visitorLayer.add(new DrawableIcon(
-                                    location.getVisitorUuid(),
-                                    location.getVisitorUuid(),
-                                    position.getCoordinates(),
-                                    2f,
-                                    2f));*/
                             visitorLayer.add(new DrawableText(location.getVisitorUuid(),
                                     position.getCoordinates(),
-                                    location.getVisitorUuid(),
+                                    v.getName(),
                                     2));
                         }
                         else
@@ -117,9 +109,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mVisitor = new Visitor();
-        // optional: set more detailed informations if you have one
         mVisitor.setName("Jan");
         mVisitor.setAge(60);
         mVisitor.setSex(Sex.MALE);
