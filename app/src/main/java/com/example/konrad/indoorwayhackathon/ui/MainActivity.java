@@ -28,7 +28,6 @@ import com.indoorway.android.common.sdk.model.IndoorwayMap;
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters;
 import com.indoorway.android.common.sdk.model.IndoorwayPosition;
 import com.indoorway.android.common.sdk.model.RegisteredVisitor;
-import com.indoorway.android.common.sdk.model.Sex;
 import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.common.sdk.model.proximity.IndoorwayNotificationInfo;
@@ -45,6 +44,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -124,7 +125,16 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         }
     };
     private IndoorwayMap currentMap;
-    private Button mButton;
+
+    @BindView(R.id.add_event_button)
+    Button addEventButton;
+
+    @BindView(R.id.fetch_items_button)
+    Button fetchItemsButton;
+
+    @BindView(R.id.get_current_position_button)
+    Button getLongLatButton;
+
     private LinkedList<String> renderedVisitors;
 
 
@@ -132,16 +142,12 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mVisitor = new Visitor();
-        mVisitor.setName("Jan placek");
-        mVisitor.setAge(60);
-        mVisitor.setSex(Sex.MALE);
-        mVisitor.setShareLocation(true);
-        this.renderedVisitors = new LinkedList<>();
-        IndoorwaySdk.instance().visitor().setup(mVisitor);
+        ButterKnife.bind(this);
+        mToken = getIntent().getExtras().getString(Utils.TOKEN_KEY);
 
-        Button button = findViewById(R.id.fetch_items);
-        button.setOnClickListener(new View.OnClickListener()
+        this.renderedVisitors = new LinkedList<>();
+
+        fetchItemsButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -186,8 +192,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
             }
         });
 
-        Button getLongLat = findViewById(R.id.position);
-        getLongLat.setOnClickListener(new View.OnClickListener() {
+        getLongLatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 double lat = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLatitude();
@@ -214,8 +219,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
             }
         });
 
-        mButton = findViewById(R.id.dupa);
-        mButton.setOnClickListener(new View.OnClickListener() {
+        addEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 IndoorwayLocationSdk.instance().customProximityEvents()
@@ -247,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
             }
         };
 
-        mToken = getIntent().getExtras().getString(Utils.TOKEN_KEY);
     }
 
     @Override
