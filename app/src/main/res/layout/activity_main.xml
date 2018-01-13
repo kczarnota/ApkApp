@@ -6,11 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
+    <Button
+        android:id="@+id/dupa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="add event"/>
+
+    <Button
+        android:id="@+id/position"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="pozycja"/>
+
     <fragment
         android:id="@+id/mapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:name="com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment"
-        />
+        >
+    </fragment>
 
 </LinearLayout>

@@ -30,7 +30,7 @@ public class VisitorSyncService extends Service
     AtomicBoolean isDownloading = new AtomicBoolean(false);
     Thread workerThread;
     Handler handler;
-    public static final int SYNC_FREQUENCY_MS = 3000;
+    public static final int SYNC_FREQUENCY_MS = 100;
 
     public VisitorSyncService()
     {

@@ -8,6 +8,9 @@ import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
@@ -16,17 +19,24 @@ import com.example.konrad.indoorwayhackathon.service.VisitorBinder;
 import com.example.konrad.indoorwayhackathon.service.VisitorSyncService;
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
+import com.indoorway.android.common.sdk.model.Coordinates;
 import com.indoorway.android.common.sdk.model.IndoorwayMap;
+import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters;
 import com.indoorway.android.common.sdk.model.IndoorwayPosition;
 import com.indoorway.android.common.sdk.model.RegisteredVisitor;
 import com.indoorway.android.common.sdk.model.Sex;
 import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
+import com.indoorway.android.common.sdk.model.proximity.IndoorwayNotificationInfo;
+import com.indoorway.android.common.sdk.model.proximity.IndoorwayProximityEvent;
+import com.indoorway.android.common.sdk.model.proximity.IndoorwayProximityEventShape;
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
+import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -37,6 +47,11 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     private Visitor mVisitor;
     MarkersLayer visitorLayer;
     private VisitorSyncService syncVisitorSeviceHandle;
+    private Action1<IndoorwayProximityEvent> eventListenter;
+    private double mLat;
+    private double mLon;
+
+
     private ServiceConnection serviceConnection = new ServiceConnection()
     {
         @Override
@@ -102,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         }
     };
     private IndoorwayMap currentMap;
+    private Button mButton;
 
 
     @Override
@@ -110,13 +126,97 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mVisitor = new Visitor();
-        mVisitor.setName("Jan");
+        mVisitor.setName("Jan placek");
         mVisitor.setAge(60);
         mVisitor.setSex(Sex.MALE);
         mVisitor.setShareLocation(true);
         IndoorwaySdk.instance().visitor().setup(mVisitor);
+
+        Button getLongLat = findViewById(R.id.position);
+        getLongLat.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                double lat = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLatitude();
+                double lon = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLongitude();
+                Toast.makeText(syncVisitorSeviceHandle, lat + " " + lon, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: " + lat + " " + lon);
+                mLat = lat;
+                mLon = lon;
+
+                IndoorwaySdk.instance().map().details(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID)
+                        .setOnCompletedListener(new Action1<IndoorwayMap>() {
+                            @Override
+                            public void onAction(IndoorwayMap indoorwayMap) {
+                                // handle map objects
+                                List<IndoorwayObjectParameters> objects = indoorwayMap.getObjects();
+
+                                for (IndoorwayObjectParameters o : objects) {
+                                    Log.d(TAG, "onAction: " + o.getName()
+                                            + "lat " + o.getCenterPoint().getLatitude()
+                                    + "lon " + o.getCenterPoint().getLongitude());
+                                }
+                            }
+                        }).execute();
+            }
+        });
+
+        mButton = findViewById(R.id.dupa);
+        mButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                IndoorwayLocationSdk.instance().customProximityEvents()
+                        .add(new IndoorwayProximityEvent(
+                                "proximity-event-id", // identifier
+                                IndoorwayProximityEvent.Trigger.ENTER, // trigger on enter or on exit?
+                                new IndoorwayProximityEventShape.Circle(
+                                        new Coordinates( 52.22234245, 21.00675825),
+                                        3.0
+                                ),
+                                Utils.BUILDING_UUID, // building identifier
+                                Utils.SECOND_FLOOR_UUID, // map identifier
+                                0L, // (optional) timeout to show notification, will be passed as parapeter to listener
+                                new IndoorwayNotificationInfo("title", "description", "url", "image") // (optional) data to show in notification
+                        ));
+                visitorLayer.add(new DrawableText("raz",
+                        new Coordinates( 52.22234245, 21.00675825),
+                        "Kitchen",
+                        2));
+            }
+        });
+
+        eventListenter = new Action1<IndoorwayProximityEvent>() {
+            @Override
+            public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {
+                Toast.makeText(syncVisitorSeviceHandle, "action", Toast.LENGTH_SHORT).show();
+                IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
+                visitorLayer.remove("raz");
+            }
+        };
     }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        IndoorwayLocationSdk.instance()
+                .customProximityEvents()
+                .onEvent()
+                .unregister(eventListenter);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        IndoorwayLocationSdk.instance()
+                .customProximityEvents()
+                .onEvent()
+                .register(eventListenter);
+    }
 
     @Override
     protected void onStart()
