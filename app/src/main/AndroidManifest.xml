@@ -17,14 +17,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ui.MapActivity"/>
+        <activity android:name=".ui.MapActivity" />
 
         <service
             android:name=".service.VisitorSyncService"
             android:enabled="true"
             android:exported="true" />
 
+        <activity android:name=".ui.ProtipsActivity"></activity>
     </application>
 
 </manifest>

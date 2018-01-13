@@ -3,6 +3,9 @@
     <item
         android:id="@+id/quests_menu_item"
         android:title="Quests" />
+    <item
+        android:id="@+id/pritip_activity_menu"
+        android:title="Protips" />
 </menu>
 
 

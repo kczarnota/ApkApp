@@ -311,9 +311,17 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             case R.id.quests_menu_item:
                 startQuestsActivity();
                 return true;
+            case R.id.pritip_activity_menu:
+                startProtipActivity();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void startProtipActivity() {
+        Intent intent = new Intent(this, ProtipsActivity.class);
+        startActivity(intent);
     }
 
     private void startQuestsActivity() {
