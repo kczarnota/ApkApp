@@ -9,6 +9,8 @@ public class Utils
     public static final String FIRST_FLOOR_UUID = "gVI7XXuBFCQ";
     public static final String SECOND_FLOOR_UUID = "3-_M01M3r5w";
 
+    public static final String TOKEN_KEY = "token";
+
     public static String getTag(String classTag) {
         return APP_TAG + " " + classTag;
     }

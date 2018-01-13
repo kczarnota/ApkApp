@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
+import com.example.konrad.indoorwayhackathon.net.login.Api;
+import com.example.konrad.indoorwayhackathon.net.login.ApiService;
 import com.example.konrad.indoorwayhackathon.service.SyncListener;
 import com.example.konrad.indoorwayhackathon.service.VisitorBinder;
 import com.example.konrad.indoorwayhackathon.service.VisitorSyncService;
@@ -36,6 +38,7 @@ import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     private Action1<IndoorwayProximityEvent> eventListenter;
     private double mLat;
     private double mLon;
+    private String mToken;
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -155,6 +159,11 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                                 }
                             }
                         }).execute();
+
+                ApiService apiService = Api.getApi();
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", "Bearer " + mToken);
+                apiService.getItems(map);
             }
         });
 
@@ -190,6 +199,8 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                 visitorLayer.remove("raz");
             }
         };
+
+        mToken = getIntent().getExtras().getString(Utils.TOKEN_KEY);
     }
 
     @Override
