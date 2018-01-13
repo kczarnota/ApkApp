@@ -22,6 +22,7 @@
             android:enabled="true"
             android:exported="true"/>
 
+        <activity android:name=".ui.MapActivity"/>
         <activity android:name=".ui.ProtipsActivity"/>
         <activity android:name=".ui.SearchPhotoActivity"/>
     </application>
