@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
-    <com.indoorway.android.map.sdk.view.IndoorwayMapView
+    <fragment
+        android:id="@+id/mapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/mapView" />
+        android:name="com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment"
+        />
 
 </LinearLayout>
