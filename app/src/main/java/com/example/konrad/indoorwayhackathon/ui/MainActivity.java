@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         mVisitor.setAge(60);
         mVisitor.setSex(Sex.MALE);
         mVisitor.setShareLocation(true);
+        this.renderedVisitors = new LinkedList<>();
         IndoorwaySdk.instance().visitor().setup(mVisitor);
 
         Button getLongLat = findViewById(R.id.position);
@@ -198,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                 .customProximityEvents()
                 .onEvent()
                 .unregister(eventListenter);
-        this.renderedVisitors = new LinkedList<String>();
     }
 
     @Override
