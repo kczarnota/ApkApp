@@ -6,18 +6,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 
-import com.example.konrad.indoorwayhackathon.ui.MainActivity;
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.common.sdk.task.IndoorwayTask;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisitorSyncService extends Service
@@ -85,8 +85,12 @@ public class VisitorSyncService extends Service
     private void onVisitorLocationsFetched(List<VisitorLocation> visitorLocations)
     {
         Map<String, VisitorLocation> map = new HashMap<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, -5);
+        Date fiveMinutesAgo = calendar.getTime();
         for (VisitorLocation location : visitorLocations) {
-            map.put(location.getVisitorUuid(), location);
+            if (location.getTimestamp() != null && !location.getTimestamp().before(fiveMinutesAgo))
+                map.put(location.getVisitorUuid(), location);
         }
 
         for (SyncListener listener : listeners) {

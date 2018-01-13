@@ -18,14 +18,19 @@ import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.IndoorwayMap;
 import com.indoorway.android.common.sdk.model.IndoorwayPosition;
+import com.indoorway.android.common.sdk.model.RegisteredVisitor;
 import com.indoorway.android.common.sdk.model.Sex;
 import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -51,18 +56,37 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                     if (currentMap == null)
                         return;
 
-                    Log.d(TAG, "onSyncCompleted: map is not null");
+                    /*IndoorwaySdk.instance().visitors().list().setOnCompletedListener(new Action1<List<RegisteredVisitor>>()
+                    {
+                        @Override
+                        public void onAction(List<RegisteredVisitor> registeredVisitors)
+                        {
+                            for (RegisteredVisitor vis : registeredVisitors) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.add(Calendar.MINUTE, -5);
+                                Date fiveMinutesAgo = calendar.getTime();
+                                if(getTimestamp() != null && !location.getTimestamp().before(fiveMinutesAgo))
+                                    Log.d(TAG, "onAction: " + vis.getName());
+                            }
+                        }
+                    }).execute();*/
+
                     for (VisitorLocation location : visitorLocations.values())
                     {
+                        Log.d(TAG, "onSyncCompleted: " + location.toString());
                         IndoorwayPosition position = location.getPosition();
                         if (position != null && position.getMapUuid().equals(currentMap.getMapUuid()))
                         {
-                            visitorLayer.add(new DrawableIcon(
+ /*                           visitorLayer.add(new DrawableIcon(
                                     location.getVisitorUuid(),
                                     location.getVisitorUuid(),
                                     position.getCoordinates(),
                                     2f,
-                                    2f));
+                                    2f));*/
+                            visitorLayer.add(new DrawableText(location.getVisitorUuid(),
+                                    position.getCoordinates(),
+                                    location.getVisitorUuid(),
+                                    2));
                         }
                         else
                         {
@@ -96,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
 
         mVisitor = new Visitor();
         // optional: set more detailed informations if you have one
-        mVisitor.setName("John Smith");
+        mVisitor.setName("Jan");
         mVisitor.setAge(60);
         mVisitor.setSex(Sex.MALE);
         mVisitor.setShareLocation(true);
