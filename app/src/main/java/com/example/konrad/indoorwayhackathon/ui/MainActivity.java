@@ -16,6 +16,8 @@ import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
 import com.example.konrad.indoorwayhackathon.net.login.Api;
 import com.example.konrad.indoorwayhackathon.net.login.ApiService;
+import com.example.konrad.indoorwayhackathon.net.login.Item;
+import com.example.konrad.indoorwayhackathon.net.login.ItemsList;
 import com.example.konrad.indoorwayhackathon.service.SyncListener;
 import com.example.konrad.indoorwayhackathon.service.VisitorBinder;
 import com.example.konrad.indoorwayhackathon.service.VisitorSyncService;
@@ -42,6 +44,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class MainActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
@@ -134,6 +140,52 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         this.renderedVisitors = new LinkedList<>();
         IndoorwaySdk.instance().visitor().setup(mVisitor);
 
+        Button button = findViewById(R.id.fetch_items);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                ApiService apiService = Api.getApi();
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", "Bearer " + mToken);
+                apiService.getItems(map).enqueue(new Callback<ItemsList>()
+                {
+                    @Override
+                    public void onResponse(Call<ItemsList> call, Response<ItemsList> response)
+                    {
+                        List<Item> items = response.body().list;
+                        for(Item i : items) {
+                            IndoorwayLocationSdk.instance().customProximityEvents()
+                                    .add(new IndoorwayProximityEvent(
+                                            i.name, // identifier
+                                            IndoorwayProximityEvent.Trigger.ENTER, // trigger on enter or on exit?
+                                            new IndoorwayProximityEventShape.Circle(
+                                                    new Coordinates(i.localization.latitude,
+                                                            i.localization.longitude),
+                                                    3.0
+                                            ),
+                                            Utils.BUILDING_UUID, // building identifier
+                                            Utils.SECOND_FLOOR_UUID, // map identifier
+                                            0L, // (optional) timeout to show notification, will be passed as parapeter to listener
+                                            new IndoorwayNotificationInfo("title", "description", "url", "image") // (optional) data to show in notification
+                                    ));
+                            visitorLayer.add(new DrawableText(i.name,
+                                    new Coordinates(i.localization.latitude, i.localization.longitude),
+                                    i.name,
+                                    2));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ItemsList> call, Throwable t)
+                    {
+
+                    }
+                });
+            }
+        });
+
         Button getLongLat = findViewById(R.id.position);
         getLongLat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,11 +211,6 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                                 }
                             }
                         }).execute();
-
-                ApiService apiService = Api.getApi();
-                Map<String, String> map = new HashMap<>();
-                map.put("Authorization", "Bearer " + mToken);
-                apiService.getItems(map);
             }
         });
 
@@ -196,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
             public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {
                 Toast.makeText(syncVisitorSeviceHandle, "action", Toast.LENGTH_SHORT).show();
                 IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
-                visitorLayer.remove("raz");
+                visitorLayer.remove(indoorwayProximityEvent.getIdentifier());
             }
         };
 

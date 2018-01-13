@@ -17,7 +17,6 @@ public interface ApiService {
     Call<LoginResponse> doLogin(@Field("grant_type") String grant, @Field("username") String username, @Field("password") String password);
 
     @GET("/api/item/all")
-    @FormUrlEncoded
-    Call<LoginResponse> getItems(@HeaderMap Map<String, String> headers);
+    Call<ItemsList> getItems(@HeaderMap Map<String, String> headers);
 }
 

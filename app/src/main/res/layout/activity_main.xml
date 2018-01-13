@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.MainActivity">
+    tools:context=".ui.MainActivity"
+    android:orientation="vertical">
 
     <Button
         android:id="@+id/dupa"
@@ -17,6 +18,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="pozycja"/>
+
+    <Button
+        android:id="@+id/fetch_items"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="items"/>
 
     <fragment
         android:id="@+id/mapFragment"
