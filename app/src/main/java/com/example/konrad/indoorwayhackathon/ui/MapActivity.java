@@ -21,6 +21,7 @@ import com.example.konrad.indoorwayhackathon.net.login.Api;
 import com.example.konrad.indoorwayhackathon.net.login.ApiService;
 import com.example.konrad.indoorwayhackathon.net.login.Item;
 import com.example.konrad.indoorwayhackathon.net.login.ItemsList;
+import com.example.konrad.indoorwayhackathon.net.login.Quest;
 import com.example.konrad.indoorwayhackathon.service.SyncListener;
 import com.example.konrad.indoorwayhackathon.service.VisitorBinder;
 import com.example.konrad.indoorwayhackathon.service.VisitorSyncService;
@@ -320,6 +321,8 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     }
 
     private void startQuestsActivity() {
+        Intent intent = new Intent(this, SearchPhotoActivity.class);
+        startActivity(intent);
     }
 }
 
