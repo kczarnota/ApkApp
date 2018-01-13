@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -51,8 +54,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MainActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
-    private static final String TAG = MainActivity.class.getSimpleName();
+public class MapActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
+    private static final String TAG = MapActivity.class.getSimpleName();
 
     private Visitor mVisitor;
     MarkersLayer visitorLayer;
@@ -141,27 +144,23 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         mToken = getIntent().getExtras().getString(Utils.TOKEN_KEY);
 
         this.renderedVisitors = new LinkedList<>();
 
-        fetchItemsButton.setOnClickListener(new View.OnClickListener()
-        {
+        fetchItemsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 ApiService apiService = Api.getApi();
                 Map<String, String> map = new HashMap<>();
                 map.put("Authorization", "Bearer " + mToken);
-                apiService.getItems(map).enqueue(new Callback<ItemsList>()
-                {
+                apiService.getItems(map).enqueue(new Callback<ItemsList>() {
                     @Override
-                    public void onResponse(Call<ItemsList> call, Response<ItemsList> response)
-                    {
+                    public void onResponse(Call<ItemsList> call, Response<ItemsList> response) {
                         List<Item> items = response.body().list;
-                        for(Item i : items) {
+                        for (Item i : items) {
                             IndoorwayLocationSdk.instance().customProximityEvents()
                                     .add(new IndoorwayProximityEvent(
                                             i.name, // identifier
@@ -184,8 +183,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                     }
 
                     @Override
-                    public void onFailure(Call<ItemsList> call, Throwable t)
-                    {
+                    public void onFailure(Call<ItemsList> call, Throwable t) {
 
                     }
                 });
@@ -299,4 +297,26 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
 
         this.visitorLayer = mapFragment.getMapView().getMarker().addLayer(12f);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.quests_menu_item:
+                startQuestsActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void startQuestsActivity() {
+    }
 }
+

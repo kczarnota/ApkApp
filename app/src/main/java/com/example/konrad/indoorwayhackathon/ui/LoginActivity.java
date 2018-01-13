@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
                 visitor.setSex(Sex.MALE);
                 visitor.setShareLocation(true);
                 IndoorwaySdk.instance().visitor().setup(visitor);
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                 intent.putExtra(Utils.TOKEN_KEY, response.body().getAccessToken());
                 startActivity(intent);
             }
