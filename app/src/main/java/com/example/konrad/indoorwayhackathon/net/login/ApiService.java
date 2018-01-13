@@ -18,5 +18,8 @@ public interface ApiService {
 
     @GET("/api/item/all")
     Call<ItemsList> getItems(@HeaderMap Map<String, String> headers);
+
+    @GET("api/quest/1")
+    Call<Quest> getQuest(@HeaderMap Map<String, String> headers);
 }
 

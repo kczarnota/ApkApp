@@ -9,7 +9,6 @@ import android.os.Looper;
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.RegisteredVisitor;
-import com.indoorway.android.common.sdk.model.Visitor;
 import com.indoorway.android.common.sdk.model.VisitorLocation;
 import com.indoorway.android.common.sdk.task.IndoorwayTask;
 

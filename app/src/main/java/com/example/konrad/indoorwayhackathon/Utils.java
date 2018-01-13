@@ -11,7 +11,17 @@ public class Utils
 
     public static final String TOKEN_KEY = "token";
 
+    public static String token;
+
     public static String getTag(String classTag) {
         return APP_TAG + " " + classTag;
+    }
+
+    public static void setToken(String t) {
+        token = t;
+    }
+
+    public static String getToken() {
+        return token;
     }
 }

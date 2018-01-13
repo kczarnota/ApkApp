@@ -57,13 +57,20 @@ import retrofit2.Response;
 public class MapActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
     private static final String TAG = MapActivity.class.getSimpleName();
 
-    private Visitor mVisitor;
+    private IndoorwayMap currentMap;
+    @BindView(R.id.add_event_button)
+    Button addEventButton;
+    @BindView(R.id.fetch_items_button)
+    Button fetchItemsButton;
+    @BindView(R.id.get_current_position_button)
+    Button getLongLatButton;
+    private LinkedList<String> renderedVisitors;
+
     MarkersLayer visitorLayer;
     private VisitorSyncService syncVisitorSeviceHandle;
     private Action1<IndoorwayProximityEvent> eventListenter;
     private double mLat;
     private double mLon;
-    private String mToken;
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
@@ -127,18 +134,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
 
         }
     };
-    private IndoorwayMap currentMap;
-
-    @BindView(R.id.add_event_button)
-    Button addEventButton;
-
-    @BindView(R.id.fetch_items_button)
-    Button fetchItemsButton;
-
-    @BindView(R.id.get_current_position_button)
-    Button getLongLatButton;
-
-    private LinkedList<String> renderedVisitors;
 
 
     @Override
@@ -146,7 +141,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
-        mToken = getIntent().getExtras().getString(Utils.TOKEN_KEY);
 
         this.renderedVisitors = new LinkedList<>();
 
@@ -155,8 +149,9 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             public void onClick(View view) {
                 ApiService apiService = Api.getApi();
                 Map<String, String> map = new HashMap<>();
-                map.put("Authorization", "Bearer " + mToken);
-                apiService.getItems(map).enqueue(new Callback<ItemsList>() {
+                map.put("Authorization", "Bearer " + Utils.getToken());
+                apiService.getItems(map).enqueue(new Callback<ItemsList>()
+                {
                     @Override
                     public void onResponse(Call<ItemsList> call, Response<ItemsList> response) {
                         List<Item> items = response.body().list;
