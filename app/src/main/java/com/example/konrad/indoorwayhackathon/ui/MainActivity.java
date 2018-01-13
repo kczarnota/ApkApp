@@ -4,9 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,12 +36,12 @@ import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener
-{
+public class MainActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private Visitor mVisitor;
@@ -52,18 +52,14 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     private double mLon;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection()
-    {
+    private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder)
-        {
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             VisitorBinder binder = (VisitorBinder) iBinder;
             syncVisitorSeviceHandle = binder.getService();
-            syncVisitorSeviceHandle.registerListener(new SyncListener()
-            {
+            syncVisitorSeviceHandle.registerListener(new SyncListener() {
                 @Override
-                public void onSyncCompleted(Map<RegisteredVisitor, VisitorLocation> visitorLocations)
-                {
+                public void onSyncCompleted(Map<RegisteredVisitor, VisitorLocation> visitorLocations) {
                     if (currentMap == null)
                         return;
 
@@ -82,47 +78,48 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                         }
                     }).execute();*/
 
-                    for (Map.Entry<RegisteredVisitor, VisitorLocation> visitor: visitorLocations.entrySet())
-                    {
+                    for (String uuid : renderedVisitors) {
+                        visitorLayer.remove(uuid);
+                    }
+
+                    renderedVisitors.clear();
+
+                    for (Map.Entry<RegisteredVisitor, VisitorLocation> visitor : visitorLocations.entrySet()) {
                         VisitorLocation location = visitor.getValue();
                         RegisteredVisitor v = visitor.getKey();
                         Log.d(TAG, "onSyncCompleted: " + location.toString());
                         IndoorwayPosition position = location.getPosition();
-                        if (position != null && position.getMapUuid().equals(currentMap.getMapUuid()))
-                        {
+                        if (position != null && position.getMapUuid().equals(currentMap.getMapUuid())) {
+                            renderedVisitors.add(location.getVisitorUuid());
                             visitorLayer.add(new DrawableText(location.getVisitorUuid(),
                                     position.getCoordinates(),
                                     v.getName(),
                                     2));
-                        }
-                        else
-                        {
+                        } else {
                             visitorLayer.remove(location.getVisitorUuid());
                         }
                     }
                 }
 
                 @Override
-                public void onSyncError()
-                {
+                public void onSyncError() {
 
                 }
             });
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName componentName)
-        {
+        public void onServiceDisconnected(ComponentName componentName) {
 
         }
     };
     private IndoorwayMap currentMap;
     private Button mButton;
+    private LinkedList<String> renderedVisitors;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mVisitor = new Visitor();
@@ -133,11 +130,9 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         IndoorwaySdk.instance().visitor().setup(mVisitor);
 
         Button getLongLat = findViewById(R.id.position);
-        getLongLat.setOnClickListener(new View.OnClickListener()
-        {
+        getLongLat.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 double lat = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLatitude();
                 double lon = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLongitude();
                 Toast.makeText(syncVisitorSeviceHandle, lat + " " + lon, Toast.LENGTH_SHORT).show();
@@ -155,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                                 for (IndoorwayObjectParameters o : objects) {
                                     Log.d(TAG, "onAction: " + o.getName()
                                             + "lat " + o.getCenterPoint().getLatitude()
-                                    + "lon " + o.getCenterPoint().getLongitude());
+                                            + "lon " + o.getCenterPoint().getLongitude());
                                 }
                             }
                         }).execute();
@@ -163,17 +158,15 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
         });
 
         mButton = findViewById(R.id.dupa);
-        mButton.setOnClickListener(new View.OnClickListener()
-        {
+        mButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 IndoorwayLocationSdk.instance().customProximityEvents()
                         .add(new IndoorwayProximityEvent(
                                 "proximity-event-id", // identifier
                                 IndoorwayProximityEvent.Trigger.ENTER, // trigger on enter or on exit?
                                 new IndoorwayProximityEventShape.Circle(
-                                        new Coordinates( 52.22234245, 21.00675825),
+                                        new Coordinates(52.22234245, 21.00675825),
                                         3.0
                                 ),
                                 Utils.BUILDING_UUID, // building identifier
@@ -182,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
                                 new IndoorwayNotificationInfo("title", "description", "url", "image") // (optional) data to show in notification
                         ));
                 visitorLayer.add(new DrawableText("raz",
-                        new Coordinates( 52.22234245, 21.00675825),
+                        new Coordinates(52.22234245, 21.00675825),
                         "Kitchen",
                         2));
             }
@@ -199,18 +192,17 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         IndoorwayLocationSdk.instance()
                 .customProximityEvents()
                 .onEvent()
                 .unregister(eventListenter);
+        this.renderedVisitors = new LinkedList<String>();
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         IndoorwayLocationSdk.instance()
                 .customProximityEvents()
@@ -219,31 +211,26 @@ public class MainActivity extends AppCompatActivity implements IndoorwayMapFragm
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
         Intent intent = new Intent(this, VisitorSyncService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
-    protected void onStop()
-    {
+    protected void onStop() {
         unbindService(serviceConnection);
         super.onStop();
     }
 
     @Override
-    public void onMapFragmentReady(MapFragment mapFragment)
-    {
+    public void onMapFragmentReady(MapFragment mapFragment) {
         mapFragment.getMapView().load(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID);
-        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>()
-        {
+        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>() {
             @Override
-            public void onAction(IndoorwayMap indoorwayMap)
-            {
+            public void onAction(IndoorwayMap indoorwayMap) {
                 currentMap = indoorwayMap;
-                if(currentMap != null) {
+                if (currentMap != null) {
                     Log.d(TAG, "onMapFragmentReady: not null");
                 }
             }
