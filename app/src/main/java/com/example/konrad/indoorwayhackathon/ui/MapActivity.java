@@ -57,10 +57,13 @@ import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
 
 import org.billthefarmer.mididriver.MidiDriver;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,8 +72,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class MapActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener
-{
+public class MapActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
     private static final String TAG = MapActivity.class.getSimpleName();
 
     private IndoorwayMap currentMap;
@@ -150,11 +152,11 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         }
     };*/
     private MidiDriver midiDriver;
+    private Map<String, Action1<IndoorwayPosition>> registredHiddenPointsAlarms;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
@@ -167,7 +169,8 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         runnable = new Runnable() {
             @Override
             public void run() {
-                try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
+                try {
+                    IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
                     if (pos != null) {
                         Coordinates cor = pos.getCoordinates();
                         visitorLayer.add(
@@ -188,13 +191,13 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         };
         handler.post(runnable);
 
-        eventListenter = new Action1<IndoorwayProximityEvent>()
-        {
+        eventListenter = new Action1<IndoorwayProximityEvent>() {
             @Override
-            public void onAction(IndoorwayProximityEvent indoorwayProximityEvent)
-            {
+            public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {
                 int reward = rewards.get(indoorwayProximityEvent.getIdentifier());
+                Action1<IndoorwayPosition> positionAction1 = registredHiddenPointsAlarms.get(indoorwayProximityEvent.getIdentifier());
                 createDialog(reward).show();
+                IndoorwayLocationSdk.instance().position().onChange().unregister(positionAction1);
                 IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
                 int cur = Integer.valueOf(currentCoins.getText().toString());
                 cur += reward;
@@ -202,17 +205,14 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                 ApiService api = Api.getApi();
                 Map<String, String> map = new HashMap<>();
                 map.put("Authorization", "Bearer " + Utils.getToken());
-                api.postAdditionalPoints(map, String.valueOf(cur)).enqueue(new Callback<Void>()
-                {
+                api.postAdditionalPoints(map, String.valueOf(cur)).enqueue(new Callback<Void>() {
                     @Override
-                    public void onResponse(Call<Void> call, Response<Void> response)
-                    {
+                    public void onResponse(Call<Void> call, Response<Void> response) {
 
                     }
 
                     @Override
-                    public void onFailure(Call<Void> call, Throwable t)
-                    {
+                    public void onFailure(Call<Void> call, Throwable t) {
 
                     }
                 });
@@ -222,33 +222,29 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         IndoorwayLocationSdk.instance()
                 .customProximityEvents()
                 .onEvent()
                 .unregister(eventListenter);
+        midiDriver.stop();
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         ApiService service = Api.getApi();
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + Utils.getToken());
-        service.getCoins(map).enqueue(new Callback<Integer>()
-        {
+        service.getCoins(map).enqueue(new Callback<Integer>() {
             @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response)
-            {
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
                 currentCoins.setText(String.valueOf(response.body()));
             }
 
             @Override
-            public void onFailure(Call<Integer> call, Throwable t)
-            {
+            public void onFailure(Call<Integer> call, Throwable t) {
 
             }
         });
@@ -256,6 +252,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                 .customProximityEvents()
                 .onEvent()
                 .register(eventListenter);
+        midiDriver.start();
     }
 
 /*    @Override
@@ -275,18 +272,15 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         super.onStop();
     }*/
 
+
     @Override
-    public void onMapFragmentReady(MapFragment mapFragment)
-    {
+    public void onMapFragmentReady(MapFragment mapFragment) {
         mapFragment.getMapView().load(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID);
-        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>()
-        {
+        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>() {
             @Override
-            public void onAction(IndoorwayMap indoorwayMap)
-            {
+            public void onAction(IndoorwayMap indoorwayMap) {
                 currentMap = indoorwayMap;
-                if (currentMap != null)
-                {
+                if (currentMap != null) {
                     Log.d(TAG, "onMapFragmentReady: not null");
                 }
                 prepareHiddenPoints();
@@ -300,18 +294,15 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        switch (item.getItemId())
-        {
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.quests_menu_item:
                 startQuestsActivity();
                 return true;
@@ -326,51 +317,73 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         }
     }
 
-    private void startQuickNavigation()
-    {
+    private void startQuickNavigation() {
         Intent intent = new Intent(this, QuickNavigationActivity.class);
         startActivity(intent);
     }
 
-    private void startProtipActivity()
-    {
+    private void startProtipActivity() {
         Intent intent = new Intent(this, ProtipsActivity.class);
         startActivity(intent);
     }
 
-    private void startQuestsActivity()
-    {
+    private void startQuestsActivity() {
         Intent intent = new Intent(this, SearchPhotoActivity.class);
         startActivity(intent);
     }
 
-    private void prepareHiddenPoints()
-    {
+    void playNoteDuringTime(final byte pitch, final long miliseconds) {
+        new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < miliseconds; i++) {
+                    byte[] playNote;
+                    playNote = new byte[3];
+                    playNote[0] = (byte) (0x90 | 0x00);  // 0x90 = note On, 0x00 = channel 1
+                    playNote[1] = (byte) pitch;  // 0x3C = middle C
+                    playNote[2] = (byte) 0x7F;  // 0x7F = the maximum velocity (127)
+                    midiDriver.queueEvent(playNote);
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    byte[] stopNote = new byte[3];
+                    stopNote[0] = (byte) (0x80 | 0x00);  // 0x80 = note Off, 0x00 = channel 1
+                    stopNote[1] = (byte) pitch;  // 0x3C = middle C
+                    stopNote[2] = (byte) 0x00;  // 0x00 = the minimum velocity (0)
+                    midiDriver.queueEvent(stopNote);
+                }
+            }
+        }).start();
+    }
+
+    private void prepareHiddenPoints() {
         ApiService apiService = Api.getApi();
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + Utils.getToken());
-        apiService.getItems(map).enqueue(new Callback<ItemsList>()
-        {
+        apiService.getItems(map).enqueue(new Callback<ItemsList>() {
             @Override
-            public void onResponse(Call<ItemsList> call, Response<ItemsList> response)
-            {
+            public void onResponse(Call<ItemsList> call, Response<ItemsList> response) {
                 rewards = new HashMap<>();
                 List<Item> items = response.body().list;
-                byte[] event;
-                event = new byte[3];
-                event[0] = (byte) (0x90 | 0x00);  // 0x90 = note On, 0x00 = channel 1
-                event[1] = (byte) 0x3C;  // 0x3C = middle C
-                event[2] = (byte) 0x7F;  // 0x7F = the maximum velocity (127)
-                for (final Item i : items)
-                {
-                    midiDriver.write(event);
-                    IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>() {
+
+                // Send the MIDI event to the synthesizer.
+                registredHiddenPointsAlarms = new HashMap<>();
+
+                for (final Item i : items) {
+                    Action1<IndoorwayPosition> action1 = new Action1<IndoorwayPosition>() {
                         @Override
                         public void onAction(IndoorwayPosition indoorwayPosition) {
-                            double distance = indoorwayPosition.getCoordinates().getDistanceTo(new Coordinates(i.localization.latitude,  i.localization.longitude));
+                            double distance = indoorwayPosition.getCoordinates().getDistanceTo(new Coordinates(i.localization.latitude, i.localization.longitude));
+                            if (distance < 10) {
+                                playNoteDuringTime((byte) 0x54, (long) (10 - distance) * 10);
+                                return;
+                            }
 
                         }
-                    });
+                    };
+                    registredHiddenPointsAlarms.put(i.name, action1);
+                    IndoorwayLocationSdk.instance().position().onChange().register(action1);
                     rewards.put(i.name, i.value);
                     IndoorwayLocationSdk.instance().customProximityEvents()
                             .add(new IndoorwayProximityEvent(
@@ -390,8 +403,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             }
 
             @Override
-            public void onFailure(Call<ItemsList> call, Throwable t)
-            {
+            public void onFailure(Call<ItemsList> call, Throwable t) {
 
             }
         });
