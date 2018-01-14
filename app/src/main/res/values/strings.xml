@@ -5,6 +5,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="reward">Reward</string>
-    <string name="dialog_collected_missiles">You have completed quest! Congratulations!</string>
+    <string name="dialog_collected_points">You have completed quest! Congratulations!</string>
     <string name="ok">OK</string>
+    <string name="dialog_collected_hidden_points">Congratulations! You have found </string>
 </resources>
