@@ -1,5 +1,7 @@
 package com.example.konrad.indoorwayhackathon.ui;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -25,8 +27,10 @@ import com.indoorway.android.common.sdk.model.proximity.IndoorwayProximityEventS
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
+import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -108,13 +112,18 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
             @Override
             public void run() {
                 try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
-                    String text;
                     if (pos != null) {
                         Coordinates cor = pos.getCoordinates();
-                        visitorLayer.add(new DrawableText("Me",
-                                cor,
-                                "me",
-                                2));
+                        //visitorLayer.remove("me1");
+                        visitorLayer.add(
+                                new DrawableIcon(
+                                        "me1",   // icon identifier
+                                        "me", // texture identifier
+                                        cor,
+                                        3f,  // icon size vertically
+                                        3f   // icon size horizontally
+                                )
+                        );
                     }
                 } catch (Exception e) {
                 } finally {
@@ -177,6 +186,9 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
 
                     }
                 });
+
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trol);
+                visitorLayer.registerTexture(new BitmapTexture("me", bitmap));
             }
         });
     }
