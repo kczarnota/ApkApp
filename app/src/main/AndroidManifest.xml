@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.konrad.indoorwayhackathon">
+          package="com.example.konrad.indoorwayhackathon">
 
     <permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <permission android:name="android.permission.BLUETOOTH"/>
@@ -16,28 +16,32 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ui.LoginActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <service
             android:name=".service.VisitorSyncService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"/>
 
-        <activity android:name=".ui.MapActivity" />
+        <activity android:name=".ui.MapActivity"/>
         <activity
             android:name=".ui.ProtipsActivity"
-            android:parentActivityName=".ui.MapActivity" />
+            android:parentActivityName=".ui.MapActivity"/>
         <activity
             android:name=".ui.SearchPhotoActivity"
-            android:parentActivityName=".ui.MapActivity" />
+            android:parentActivityName=".ui.MapActivity"/>
         <activity
             android:name=".ui.QuickNavigationActivity"
-            android:parentActivityName=".ui.MapActivity" />
-        <activity android:parentActivityName=".ui.QuickNavigationActivity" android:name=".ui.NavigationActivity"></activity>
+            android:parentActivityName=".ui.MapActivity"/>
+        <activity
+            android:name=".ui.NavigationActivity"
+            android:parentActivityName=".ui.QuickNavigationActivity"/>
+        <activity android:name=".ui.QuickActions">
+        </activity>
     </application>
 
 </manifest>

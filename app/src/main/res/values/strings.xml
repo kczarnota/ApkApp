@@ -8,4 +8,10 @@
     <string name="dialog_collected_points">You have completed quest! Congratulations!</string>
     <string name="ok">OK</string>
     <string name="dialog_collected_hidden_points">Congratulations! You have found </string>
+    <string name="food">Food</string>
+    <string name="toilets">Toilets</string>
+    <string name="quiet_place">Quiet place</string>
+    <string name="integration_spot">Integration spot</string>
+    <string name="gaming_zone">Gaming zone</string>
+    <string name="free_wi_fi_zone">Free wi-fi zone</string>
 </resources>

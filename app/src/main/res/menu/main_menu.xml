@@ -9,6 +9,9 @@
     <item
         android:id="@+id/quict_navigation_menu_item"
         android:title="Quick Seach" />
+    <item
+        android:id="@+id/quict_action_menu_item"
+        android:title="Quick Actions" />
 </menu>
 
 

@@ -312,6 +312,9 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             case R.id.quict_navigation_menu_item:
                 startQuickNavigation();
                 return true;
+            case R.id.quict_action_menu_item:
+                startActionsActivity();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -329,6 +332,11 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
 
     private void startQuestsActivity() {
         Intent intent = new Intent(this, SearchPhotoActivity.class);
+        startActivity(intent);
+    }
+
+    private void startActionsActivity() {
+        Intent intent = new Intent(this, QuickActions.class);
         startActivity(intent);
     }
 
