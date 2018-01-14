@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.example.konrad.indoorwayhackathon.R;
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters;
+import com.indoorway.android.common.sdk.model.IndoorwayPosition;
+import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 
 import java.util.ArrayList;
 
@@ -43,7 +45,9 @@ public class QuickNavItemsListAdapter extends ArrayAdapter<IndoorwayObjectParame
         if (item != null) {
             // My layout has only one TextView
             // do whatever you want with your string and long
-            viewHolder.itemView.setText(String.format("%s", item.getName()));
+            IndoorwayPosition indoorwayPosition = IndoorwayLocationSdk.instance().position().latest();
+            double distance = item.getCenterPoint().getDistanceTo(indoorwayPosition.getCoordinates());
+            viewHolder.itemView.setText(String.format("%s - %f meters", item.getName(), distance));
         }
         return convertView;
     }

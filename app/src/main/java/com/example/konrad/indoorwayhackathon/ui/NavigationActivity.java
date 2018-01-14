@@ -22,6 +22,7 @@ public class NavigationActivity extends AppCompatActivity implements IndoorwayMa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         this.targetId = this.getIntent().getStringExtra("target");
+        setTitle("Navigation to point");
     }
 
     @Override

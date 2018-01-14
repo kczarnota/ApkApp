@@ -16,9 +16,12 @@ import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.IndoorwayMap;
 import com.indoorway.android.common.sdk.model.IndoorwayObjectParameters;
 import com.indoorway.android.common.sdk.model.IndoorwayPosition;
+import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
@@ -38,8 +41,9 @@ public class QuickNavigationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quick_navigation);
         ButterKnife.bind(this);
 
-
-
+        items = new ArrayList<>();
+        adapter = new QuickNavItemsListAdapter(QuickNavigationActivity.this, R.layout.pritip_list_item, items);
+        quickNavTargesList.setAdapter(adapter);
 
         quickNavTargesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -52,11 +56,26 @@ public class QuickNavigationActivity extends AppCompatActivity {
         IndoorwaySdk.instance().map().details(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID).setOnCompletedListener(new Action1<IndoorwayMap>() {
             @Override
             public void onAction(IndoorwayMap indoorwayMap) {
-                List<IndoorwayObjectParameters> objects = indoorwayMap.getObjects();
-                items = new ArrayList<IndoorwayObjectParameters>();
-                items.addAll(objects);
-                adapter = new QuickNavItemsListAdapter(QuickNavigationActivity.this, R.layout.pritip_list_item, items);
-                quickNavTargesList.setAdapter(adapter);
+                final List<IndoorwayObjectParameters> objects = indoorwayMap.getObjects();
+                IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>() {
+                    @Override
+                    public void onAction(final IndoorwayPosition indoorwayPosition) {
+                        Collections.sort(objects, new Comparator<IndoorwayObjectParameters>() {
+                            @Override
+                            public int compare(IndoorwayObjectParameters o1, IndoorwayObjectParameters o2) {
+                                double diff = o1.getCenterPoint().getDistanceTo(indoorwayPosition.getCoordinates()) - o2.getCenterPoint().getDistanceTo(indoorwayPosition.getCoordinates());
+                                if (diff < 0) {
+                                    return -1;
+                                } else if (diff > 0) {
+                                    return 1;
+                                } else return 0;
+                            }
+                        });
+                        items.clear();
+                        items.addAll(objects);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
             }
         }).execute();
     }

@@ -69,26 +69,7 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
         setContentView(R.layout.activity_search_photo);
         ButterKnife.bind(this);
 
-        Button btn = findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
-                String text;
-                if (pos != null) {
-                    Coordinates cor = pos.getCoordinates();
-                    text = cor.getLatitude() + " " + cor.getLongitude();
-                } else {
-                    text = "position null";
-                }
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        randomNum = ThreadLocalRandom.current().nextInt(0, 2);
-
+        setTitle("Quest");
         eventListenter = new Action1<IndoorwayProximityEvent>() {
             @Override
             public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {

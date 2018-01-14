@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,40 +9,33 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/coin_logo" />
 
         <TextView
             android:id="@+id/current_coins_label"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Current Coins" />
+            android:layout_weight="2"
+            android:text="Current Coins"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/current_coins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="4" />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:textAlignment="center"
+            android:textSize="24sp" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/add_event_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="add event" />
-
-    <Button
-        android:id="@+id/get_current_position_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="pozycja" />
-
-    <Button
-        android:id="@+id/fetch_items_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="items" />
 
     <fragment
         android:id="@+id/mapFragment"

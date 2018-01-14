@@ -62,12 +62,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     private static final String TAG = MapActivity.class.getSimpleName();
 
     private IndoorwayMap currentMap;
-    @BindView(R.id.add_event_button)
-    Button addEventButton;
-    @BindView(R.id.fetch_items_button)
-    Button fetchItemsButton;
-    @BindView(R.id.get_current_position_button)
-    Button getLongLatButton;
     @BindView(R.id.current_coins)
     TextView currentCoins;
     private LinkedList<String> renderedVisitors;
@@ -149,74 +143,10 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
+        setTitle("Map");
 
         this.renderedVisitors = new LinkedList<>();
 
-        fetchItemsButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-
-            }
-        });
-
-        getLongLatButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                double lat = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLatitude();
-                double lon = IndoorwayLocationSdk.instance().position().latest().getCoordinates().getLongitude();
-                Toast.makeText(syncVisitorSeviceHandle, lat + " " + lon, Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onClick: " + lat + " " + lon);
-                mLat = lat;
-                mLon = lon;
-
-                IndoorwaySdk.instance().map().details(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID)
-                        .setOnCompletedListener(new Action1<IndoorwayMap>()
-                        {
-                            @Override
-                            public void onAction(IndoorwayMap indoorwayMap)
-                            {
-                                // handle map objects
-                                List<IndoorwayObjectParameters> objects = indoorwayMap.getObjects();
-
-                                for (IndoorwayObjectParameters o : objects)
-                                {
-                                    Log.d(TAG, "onAction: " + o.getName()
-                                            + "lat " + o.getCenterPoint().getLatitude()
-                                            + "lon " + o.getCenterPoint().getLongitude());
-                                }
-                            }
-                        }).execute();
-            }
-        });
-
-        addEventButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                IndoorwayLocationSdk.instance().customProximityEvents()
-                        .add(new IndoorwayProximityEvent(
-                                "proximity-event-id", // identifier
-                                IndoorwayProximityEvent.Trigger.ENTER, // trigger on enter or on exit?
-                                new IndoorwayProximityEventShape.Circle(
-                                        new Coordinates(52.22234245, 21.00675825),
-                                        3.0
-                                ),
-                                Utils.BUILDING_UUID, // building identifier
-                                Utils.SECOND_FLOOR_UUID, // map identifier
-                                0L, // (optional) timeout to show notification, will be passed as parapeter to listener
-                                new IndoorwayNotificationInfo("title", "description", "url", "image") // (optional) data to show in notification
-                        ));
-                visitorLayer.add(new DrawableText("raz",
-                        new Coordinates(52.22234245, 21.00675825),
-                        "Kitchen",
-                        2));
-            }
-        });
 
         eventListenter = new Action1<IndoorwayProximityEvent>()
         {

@@ -37,7 +37,7 @@
         <activity
             android:name=".ui.QuickNavigationActivity"
             android:parentActivityName=".ui.MapActivity" />
-        <activity android:name=".ui.NavigationActivity"></activity>
+        <activity android:parentActivityName=".ui.QuickNavigationActivity" android:name=".ui.NavigationActivity"></activity>
     </application>
 
 </manifest>
