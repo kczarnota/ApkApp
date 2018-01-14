@@ -247,21 +247,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             }
         };
 
-        ApiService service = Api.getApi();
-        Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Bearer " + Utils.getToken());
-        service.getCoins(map).enqueue(new Callback<Integer>() {
-            @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                currentCoins.setText(String.valueOf(response.body()));
-            }
-
-            @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
-
-            }
-        });
-
     }
 
     @Override
@@ -276,6 +261,20 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     @Override
     protected void onResume() {
         super.onResume();
+        ApiService service = Api.getApi();
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + Utils.getToken());
+        service.getCoins(map).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                currentCoins.setText(String.valueOf(response.body()));
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+
+            }
+        });
         IndoorwayLocationSdk.instance()
                 .customProximityEvents()
                 .onEvent()
