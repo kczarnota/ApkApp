@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.example.konrad.indoorwayhackathon">
 
+    <permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <permission android:name="android.permission.BLUETOOTH"/>
+    <permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
     <application
         android:name=".IndoorwayApplication"
         android:allowBackup="true"
