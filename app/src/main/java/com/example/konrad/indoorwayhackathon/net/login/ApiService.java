@@ -9,6 +9,7 @@ import retrofit2.http.GET;
 import retrofit2.http.HeaderMap;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface ApiService {
     @POST("/oauth/token")
@@ -24,5 +25,8 @@ public interface ApiService {
 
     @GET("/api/user/get/coin/")
     Call<Integer> getCoins(@HeaderMap Map<String, String> headers);
+
+    @GET("/api/user/add/coin")
+    Call<Void> postAdditionalPoints(@HeaderMap Map<String, String> headers, @Query("value") String value);
 }
 

@@ -83,6 +83,23 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                 Toast.makeText(SearchPhotoActivity.this, "item collected", Toast.LENGTH_SHORT).show();
                 visitorLayer.remove(indoorwayProximityEvent.getIdentifier());
                 IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
+                ApiService api = Api.getApi();
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", "Bearer " + Utils.getToken());
+                api.postAdditionalPoints(map, mRewardTextView.getText().toString()).enqueue(new Callback<Void>()
+                {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response)
+                    {
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t)
+                    {
+
+                    }
+                });
             }
         };
 
