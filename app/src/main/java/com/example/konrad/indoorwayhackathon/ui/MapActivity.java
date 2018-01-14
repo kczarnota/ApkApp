@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.konrad.indoorwayhackathon.R;
@@ -65,6 +66,8 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     Button fetchItemsButton;
     @BindView(R.id.get_current_position_button)
     Button getLongLatButton;
+    @BindView(R.id.current_coins)
+    TextView currentCoins;
     private LinkedList<String> renderedVisitors;
 
     MarkersLayer visitorLayer;
@@ -151,8 +154,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                 ApiService apiService = Api.getApi();
                 Map<String, String> map = new HashMap<>();
                 map.put("Authorization", "Bearer " + Utils.getToken());
-                apiService.getItems(map).enqueue(new Callback<ItemsList>()
-                {
+                apiService.getItems(map).enqueue(new Callback<ItemsList>() {
                     @Override
                     public void onResponse(Call<ItemsList> call, Response<ItemsList> response) {
                         List<Item> items = response.body().list;
@@ -244,6 +246,21 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                 visitorLayer.remove(indoorwayProximityEvent.getIdentifier());
             }
         };
+
+        ApiService service = Api.getApi();
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + Utils.getToken());
+        service.getCoins(map).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                currentCoins.setText(String.valueOf(response.body()));
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+
+            }
+        });
 
     }
 

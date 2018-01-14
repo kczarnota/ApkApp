@@ -21,5 +21,8 @@ public interface ApiService {
 
     @GET("api/quest/1")
     Call<Quest> getQuest(@HeaderMap Map<String, String> headers);
+
+    @GET("/api/user/get/coin/")
+    Call<Integer> getCoins(@HeaderMap Map<String, String> headers);
 }
 
