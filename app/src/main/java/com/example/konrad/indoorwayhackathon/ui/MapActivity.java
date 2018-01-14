@@ -55,6 +55,8 @@ import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
 
+import org.billthefarmer.mididriver.MidiDriver;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -147,6 +149,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
 
         }
     };*/
+    private MidiDriver midiDriver;
 
 
     @Override
@@ -156,6 +159,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         setContentView(R.layout.activity_map);
         ButterKnife.bind(this);
         setTitle("Map");
+        midiDriver = new MidiDriver();
 
         this.renderedVisitors = new LinkedList<>();
 
@@ -260,12 +264,14 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         super.onStart();
         Intent intent = new Intent(this, VisitorSyncService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        midiDriver.start();
     }
 
     @Override
     protected void onStop()
     {
         unbindService(serviceConnection);
+        midiDriver.stop();
         super.onStop();
     }*/
 
@@ -350,8 +356,21 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             {
                 rewards = new HashMap<>();
                 List<Item> items = response.body().list;
-                for (Item i : items)
+                byte[] event;
+                event = new byte[3];
+                event[0] = (byte) (0x90 | 0x00);  // 0x90 = note On, 0x00 = channel 1
+                event[1] = (byte) 0x3C;  // 0x3C = middle C
+                event[2] = (byte) 0x7F;  // 0x7F = the maximum velocity (127)
+                for (final Item i : items)
                 {
+                    midiDriver.write(event);
+                    IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>() {
+                        @Override
+                        public void onAction(IndoorwayPosition indoorwayPosition) {
+                            double distance = indoorwayPosition.getCoordinates().getDistanceTo(new Coordinates(i.localization.latitude,  i.localization.longitude));
+
+                        }
+                    });
                     rewards.put(i.name, i.value);
                     IndoorwayLocationSdk.instance().customProximityEvents()
                             .add(new IndoorwayProximityEvent(
