@@ -25,7 +25,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class QuickNavigationActivity extends AppCompatActivity {
+public class QuickNavigationActivity extends AppCompatActivity
+{
     private static final String TAG = MapActivity.class.getSimpleName();
 
     @BindView(R.id.quick_actions_list)
@@ -34,7 +35,8 @@ public class QuickNavigationActivity extends AppCompatActivity {
     private ArrayList<IndoorwayObjectParameters> items;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quick_navigation);
         ButterKnife.bind(this);
@@ -43,28 +45,38 @@ public class QuickNavigationActivity extends AppCompatActivity {
         adapter = new QuickNavItemsListAdapter(QuickNavigationActivity.this, R.layout.distance_list_item, items);
         quickNavTargesList.setAdapter(adapter);
 
-        quickNavTargesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        quickNavTargesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 IndoorwayObjectParameters objectParameters = items.get(position);
                 startNavigation(objectParameters.getId());
             }
         });
 
-        IndoorwaySdk.instance().map().details(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID).setOnCompletedListener(new Action1<IndoorwayMap>() {
+        IndoorwaySdk.instance().map().details(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID).setOnCompletedListener(new Action1<IndoorwayMap>()
+        {
             @Override
-            public void onAction(IndoorwayMap indoorwayMap) {
+            public void onAction(IndoorwayMap indoorwayMap)
+            {
                 final List<IndoorwayObjectParameters> objects = indoorwayMap.getObjects();
-                IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>() {
+                IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>()
+                {
                     @Override
-                    public void onAction(final IndoorwayPosition indoorwayPosition) {
-                        Collections.sort(objects, new Comparator<IndoorwayObjectParameters>() {
+                    public void onAction(final IndoorwayPosition indoorwayPosition)
+                    {
+                        Collections.sort(objects, new Comparator<IndoorwayObjectParameters>()
+                        {
                             @Override
-                            public int compare(IndoorwayObjectParameters o1, IndoorwayObjectParameters o2) {
+                            public int compare(IndoorwayObjectParameters o1, IndoorwayObjectParameters o2)
+                            {
                                 double diff = o1.getCenterPoint().getDistanceTo(indoorwayPosition.getCoordinates()) - o2.getCenterPoint().getDistanceTo(indoorwayPosition.getCoordinates());
-                                if (diff < 0) {
+                                if (diff < 0)
+                                {
                                     return -1;
-                                } else if (diff > 0) {
+                                } else if (diff > 0)
+                                {
                                     return 1;
                                 } else return 0;
                             }
@@ -78,7 +90,8 @@ public class QuickNavigationActivity extends AppCompatActivity {
         }).execute();
     }
 
-    private void startNavigation(String targetId) {
+    private void startNavigation(String targetId)
+    {
         Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
         intent.putExtra("target", targetId);
         startActivity(intent);

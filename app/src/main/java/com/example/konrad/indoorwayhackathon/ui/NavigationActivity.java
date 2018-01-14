@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
-import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.Coordinates;
 import com.indoorway.android.common.sdk.model.IndoorwayMap;
@@ -20,26 +19,32 @@ import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
 
-public class NavigationActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener {
-    public IndoorwayMap currentMap;
+public class NavigationActivity extends AppCompatActivity implements IndoorwayMapFragment.OnMapFragmentReadyListener
+{
     private String targetId;
     private Handler handler;
     private Runnable runnable;
     private MarkersLayer visitorLayer;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         this.targetId = this.getIntent().getStringExtra("target");
         setTitle("Navigation to point");
 
         handler = new Handler();
-        runnable = new Runnable() {
+        runnable = new Runnable()
+        {
             @Override
-            public void run() {
-                try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
-                    if (pos != null) {
+            public void run()
+            {
+                try
+                {
+                    IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
+                    if (pos != null)
+                    {
                         Coordinates cor = pos.getCoordinates();
                         visitorLayer.add(
                                 new DrawableIcon(
@@ -51,8 +56,10 @@ public class NavigationActivity extends AppCompatActivity implements IndoorwayMa
                                 )
                         );
                     }
-                } catch (Exception e) {
-                } finally {
+                } catch (Exception e)
+                {
+                } finally
+                {
                     handler.postDelayed(runnable, 100);
                 }
             }
@@ -61,15 +68,20 @@ public class NavigationActivity extends AppCompatActivity implements IndoorwayMa
     }
 
     @Override
-    public void onMapFragmentReady(final MapFragment mapFragment) {
+    public void onMapFragmentReady(final MapFragment mapFragment)
+    {
         mapFragment.getMapView().load(Utils.BUILDING_UUID, Utils.SECOND_FLOOR_UUID);
         this.visitorLayer = mapFragment.getMapView().getMarker().addLayer(12f);
-        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>() {
+        mapFragment.getMapView().setOnMapLoadCompletedListener(new Action1<IndoorwayMap>()
+        {
             @Override
-            public void onAction(IndoorwayMap indoorwayMap) {
-                IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>() {
+            public void onAction(IndoorwayMap indoorwayMap)
+            {
+                IndoorwayLocationSdk.instance().position().onChange().register(new Action1<IndoorwayPosition>()
+                {
                     @Override
-                    public void onAction(IndoorwayPosition indoorwayPosition) {
+                    public void onAction(IndoorwayPosition indoorwayPosition)
+                    {
                         mapFragment.getMapView().getNavigation().start(indoorwayPosition.getCoordinates(), targetId);
                     }
                 });

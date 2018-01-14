@@ -9,18 +9,16 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
-import com.example.konrad.indoorwayhackathon.net.login.Api;
-import com.example.konrad.indoorwayhackathon.net.login.ApiService;
-import com.example.konrad.indoorwayhackathon.net.login.Quest;
+import com.example.konrad.indoorwayhackathon.net.Api;
+import com.example.konrad.indoorwayhackathon.net.ApiService;
+import com.example.konrad.indoorwayhackathon.model.Quest;
 import com.indoorway.android.common.sdk.listeners.generic.Action1;
 import com.indoorway.android.common.sdk.model.Coordinates;
 import com.indoorway.android.common.sdk.model.IndoorwayMap;
@@ -70,9 +68,11 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
         ButterKnife.bind(this);
 
         setTitle("Quest");
-        eventListenter = new Action1<IndoorwayProximityEvent>() {
+        eventListenter = new Action1<IndoorwayProximityEvent>()
+        {
             @Override
-            public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {
+            public void onAction(IndoorwayProximityEvent indoorwayProximityEvent)
+            {
 
                 visitorLayer.remove(indoorwayProximityEvent.getIdentifier());
                 IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
@@ -99,11 +99,16 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
         };
 
         handler = new Handler();
-        runnable = new Runnable() {
+        runnable = new Runnable()
+        {
             @Override
-            public void run() {
-                try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
-                    if (pos != null) {
+            public void run()
+            {
+                try
+                {
+                    IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
+                    if (pos != null)
+                    {
                         Coordinates cor = pos.getCoordinates();
                         visitorLayer.add(
                                 new DrawableIcon(
@@ -115,8 +120,10 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                                 )
                         );
                     }
-                } catch (Exception e) {
-                } finally {
+                } catch (Exception e)
+                {
+                } finally
+                {
                     handler.postDelayed(runnable, 100);
                 }
             }
@@ -150,7 +157,8 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                         {
                             String path = "http://192.168.100.194:8080/resources/image?name=" + quest.imageName;
                             Picasso.with(getApplicationContext()).load(path).into(mQuestIcon);
-                        } else {
+                        } else
+                        {
                             mQuestIcon.setImageDrawable(getDrawable(R.drawable.q_mark));
                             placeName.setText(quest.name);
                         }
@@ -190,7 +198,8 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
         IndoorwayLocationSdk.instance()
                 .customProximityEvents()
@@ -208,12 +217,15 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                 .register(eventListenter);
     }
 
-    private Dialog createDialog() {
+    private Dialog createDialog()
+    {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.dialog_collected_points)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    public void onClick(DialogInterface dialog, int id)
+                    {
                         Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                         startActivity(intent);
                     }

@@ -1,4 +1,4 @@
-package com.example.konrad.indoorwayhackathon.net.login;
+package com.example.konrad.indoorwayhackathon.model;
 
 
 import com.google.gson.annotations.Expose;

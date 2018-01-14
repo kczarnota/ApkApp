@@ -1,4 +1,9 @@
-package com.example.konrad.indoorwayhackathon.net.login;
+package com.example.konrad.indoorwayhackathon.net;
+
+import com.example.konrad.indoorwayhackathon.model.ItemsList;
+import com.example.konrad.indoorwayhackathon.model.LoginResponse;
+import com.example.konrad.indoorwayhackathon.model.Quest;
+import com.example.konrad.indoorwayhackathon.model.Subjects;
 
 import java.util.Map;
 
@@ -11,7 +16,8 @@ import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface ApiService {
+public interface ApiService
+{
     @POST("/oauth/token")
     @Headers("Authorization: Basic dGVzdGp3dGNsaWVudGlkOlhZN2ttem9OemwxMDA=")
     @FormUrlEncoded

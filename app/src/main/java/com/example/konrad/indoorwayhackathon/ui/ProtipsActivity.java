@@ -2,7 +2,6 @@ package com.example.konrad.indoorwayhackathon.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -14,14 +13,16 @@ import java.util.Arrays;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ProtipsActivity extends AppCompatActivity {
+public class ProtipsActivity extends AppCompatActivity
+{
 
     @BindView(R.id.list_of_tips)
     ListView list;
     private ArrayAdapter<String> adapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_protips);
         ButterKnife.bind(this);
@@ -32,8 +33,9 @@ public class ProtipsActivity extends AppCompatActivity {
         list.setAdapter(this.adapter);
     }
 
-    String [] getProtips() {
-        return new String[] {
+    String[] getProtips()
+    {
+        return new String[]{
                 "Sala 01 jest gdzie indziej niż 1. Tej pierwszej szukaj w piwnicy",
                 "Lepiej uważać na automat przy głównym wejściu - potrafi nie wydać produktu!",
                 "Szukasz wygodnego i cichego miejsca do nauki? Sprawdź salę 102!",

@@ -8,9 +8,9 @@ import android.widget.TextView;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
-import com.example.konrad.indoorwayhackathon.net.login.Api;
-import com.example.konrad.indoorwayhackathon.net.login.ApiService;
-import com.example.konrad.indoorwayhackathon.net.login.LoginResponse;
+import com.example.konrad.indoorwayhackathon.net.Api;
+import com.example.konrad.indoorwayhackathon.net.ApiService;
+import com.example.konrad.indoorwayhackathon.model.LoginResponse;
 import com.indoorway.android.common.sdk.IndoorwaySdk;
 import com.indoorway.android.common.sdk.model.Sex;
 import com.indoorway.android.common.sdk.model.Visitor;
@@ -23,7 +23,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity
+{
     public static final String TAG = LoginActivity.class.getSimpleName();
 
     @BindView(R.id.loginField)
@@ -32,23 +33,27 @@ public class LoginActivity extends AppCompatActivity {
     TextView passwordField;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        setTitle("Login to App");
+        setTitle("Login");
     }
 
-    public void doLogin(final View view) throws IOException {
+    public void doLogin(final View view) throws IOException
+    {
         final String loginName = loginField.getText().toString();
         String password = passwordField.getText().toString();
 
         ApiService service = Api.getApi();
 
         Call<LoginResponse> response = service.doLogin("password", loginName, password);
-        response.enqueue(new Callback<LoginResponse>() {
+        response.enqueue(new Callback<LoginResponse>()
+        {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response)
+            {
                 Visitor visitor = new Visitor();
                 visitor.setName(loginName);
                 visitor.setAge(60);
@@ -61,7 +66,8 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(Call<LoginResponse> call, Throwable t)
+            {
             }
         });
     }

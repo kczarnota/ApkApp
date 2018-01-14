@@ -24,12 +24,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class VisitorSyncService extends Service
 {
-    Set<SyncListener> listeners = new CopyOnWriteArraySet<>();
-    AtomicBoolean isRunning = new AtomicBoolean(false);
-    AtomicBoolean isDownloading = new AtomicBoolean(false);
-    Thread workerThread;
-    Handler handler;
     public static final int SYNC_FREQUENCY_MS = 100;
+
+    Set<SyncListener> mListeners = new CopyOnWriteArraySet<>();
+    AtomicBoolean mIsRunning = new AtomicBoolean(false);
+    AtomicBoolean mIsDownloading = new AtomicBoolean(false);
+    Thread mWorkerThread;
+    Handler mHandler;
 
     public VisitorSyncService()
     {
@@ -37,42 +38,54 @@ public class VisitorSyncService extends Service
     }
 
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
-        isRunning.set(true);
-        handler = new Handler(Looper.getMainLooper());
-        workerThread = new Thread(new Runnable() {
+        mIsRunning.set(true);
+        mHandler = new Handler(Looper.getMainLooper());
+        mWorkerThread = new Thread(new Runnable()
+        {
             @Override
-            public void run() {
-                while (isRunning.get()) {
-                    try {
+            public void run()
+            {
+                while (mIsRunning.get())
+                {
+                    try
+                    {
                         // polling locations
                         fetchLocations();
                         Thread.sleep(SYNC_FREQUENCY_MS);
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException e)
+                    {
                         // exit
                     }
                 }
             }
         });
-        workerThread.start();
+        mWorkerThread.start();
     }
 
-    private void fetchLocations() {
-        if (isDownloading.compareAndSet(false, true)) {
+    private void fetchLocations()
+    {
+        if (mIsDownloading.compareAndSet(false, true))
+        {
             IndoorwaySdk.instance()
                     .visitors()
                     .locations()
-                    .setOnCompletedListener(new Action1<List<VisitorLocation>>() {
+                    .setOnCompletedListener(new Action1<List<VisitorLocation>>()
+                    {
                         @Override
-                        public void onAction(List<VisitorLocation> visitorLocations) {
+                        public void onAction(List<VisitorLocation> visitorLocations)
+                        {
                             getVisitorsNow(visitorLocations);
                         }
                     })
-                    .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>() {
+                    .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>()
+                    {
                         @Override
-                        public void onAction(IndoorwayTask.ProcessingException e) {
-                            isDownloading.set(false);
+                        public void onAction(IndoorwayTask.ProcessingException e)
+                        {
+                            mIsDownloading.set(false);
                         }
                     }).execute();
         }
@@ -82,30 +95,33 @@ public class VisitorSyncService extends Service
     {
     }
 
-    private void getVisitorsNow(List <VisitorLocation> visitorLocations) {
-        final List <VisitorLocation> visitorLocationLinkedList = new LinkedList<>();
+    private void getVisitorsNow(List<VisitorLocation> visitorLocations)
+    {
+        final List<VisitorLocation> visitorLocationLinkedList = new LinkedList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, -1);
         Date fiveMinutesAgo = calendar.getTime();
-        for (VisitorLocation location : visitorLocations) {
+        for (VisitorLocation location : visitorLocations)
+        {
             if (location.getTimestamp() != null && !location.getTimestamp().before(fiveMinutesAgo))
                 visitorLocationLinkedList.add(location);
         }
         IndoorwaySdk.instance()
                 .visitors()
                 .list()
-                .setOnCompletedListener(new Action1<List<RegisteredVisitor>>() {
+                .setOnCompletedListener(new Action1<List<RegisteredVisitor>>()
+                {
                     @Override
-                    public void onAction(List<RegisteredVisitor> visitors) {
+                    public void onAction(List<RegisteredVisitor> visitors)
+                    {
                         Map<RegisteredVisitor, VisitorLocation> map = new HashMap<>();
-                        isDownloading.set(false);
-                        for (RegisteredVisitor visitor: visitors) {
-/*                            Visitor myself = IndoorwaySdk.instance().visitor().me();
-                            if (visitor.getUuid() == myself.getUuid()) {
-                                continue;
-                            }*/
-                            for (VisitorLocation visitorLocation :visitorLocationLinkedList) {
-                                if (visitor.getUuid().equals(visitorLocation.getVisitorUuid())) {
+                        mIsDownloading.set(false);
+                        for (RegisteredVisitor visitor : visitors)
+                        {
+                            for (VisitorLocation visitorLocation : visitorLocationLinkedList)
+                            {
+                                if (visitor.getUuid().equals(visitorLocation.getVisitorUuid()))
+                                {
                                     map.put(visitor, visitorLocation);
                                     onVisitorLocationsFetched(map);
                                 }
@@ -113,25 +129,30 @@ public class VisitorSyncService extends Service
                         }
                     }
                 })
-                .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>() {
+                .setOnFailedListener(new Action1<IndoorwayTask.ProcessingException>()
+                {
                     @Override
-                    public void onAction(IndoorwayTask.ProcessingException e) {
-                        isDownloading.set(false);
+                    public void onAction(IndoorwayTask.ProcessingException e)
+                    {
+                        mIsDownloading.set(false);
                         onVisitorLocationsFetchFailed();
                     }
                 }).execute();
 
     }
 
-    private void onVisitorLocationsFetched(Map<RegisteredVisitor, VisitorLocation> visitorLocations) {
-        for (SyncListener listener : listeners) {
+    private void onVisitorLocationsFetched(Map<RegisteredVisitor, VisitorLocation> visitorLocations)
+    {
+        for (SyncListener listener : mListeners)
+        {
             listener.onSyncCompleted(visitorLocations);
         }
     }
 
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
         return START_STICKY;
     }
 
@@ -141,11 +162,13 @@ public class VisitorSyncService extends Service
         return new VisitorBinder(this);
     }
 
-    public void registerListener(SyncListener listener) {
-        listeners.add(listener);
+    public void registerListener(SyncListener listener)
+    {
+        mListeners.add(listener);
     }
 
-    public void unregisterListener(SyncListener listener) {
-        listeners.remove(listener);
+    public void unregisterListener(SyncListener listener)
+    {
+        mListeners.remove(listener);
     }
 }

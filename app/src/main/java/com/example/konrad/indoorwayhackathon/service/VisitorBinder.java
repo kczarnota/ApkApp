@@ -6,11 +6,13 @@ public class VisitorBinder extends Binder
 {
     private VisitorSyncService mService;
 
-    public VisitorBinder(VisitorSyncService service) {
+    public VisitorBinder(VisitorSyncService service)
+    {
         mService = service;
     }
 
-    public VisitorSyncService getService() {
+    public VisitorSyncService getService()
+    {
         return mService;
     }
 }

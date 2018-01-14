@@ -14,18 +14,23 @@ import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 
 import java.util.ArrayList;
 
-public class QuickNavItemsListAdapter extends ArrayAdapter<IndoorwayObjectParameters> {
-    private static class ViewHolder {
+public class QuickNavItemsListAdapter extends ArrayAdapter<IndoorwayObjectParameters>
+{
+    private static class ViewHolder
+    {
         private TextView itemView;
     }
 
-    public QuickNavItemsListAdapter(Context context, int textViewResourceId, ArrayList<IndoorwayObjectParameters> items) {
+    public QuickNavItemsListAdapter(Context context, int textViewResourceId, ArrayList<IndoorwayObjectParameters> items)
+    {
         super(context, textViewResourceId, items);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         ViewHolder viewHolder;
-        if (convertView == null) {
+        if (convertView == null)
+        {
             convertView = LayoutInflater.from(this.getContext())
                     .inflate(R.layout.distance_list_item, parent, false);
 
@@ -33,12 +38,14 @@ public class QuickNavItemsListAdapter extends ArrayAdapter<IndoorwayObjectParame
             viewHolder.itemView = (TextView) convertView.findViewById(R.id.protip_list_row);
 
             convertView.setTag(viewHolder);
-        } else {
+        } else
+        {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
         final IndoorwayObjectParameters item = getItem(position);
-        if (item != null) {
+        if (item != null)
+        {
             // My layout has only one TextView
             // do whatever you want with your string and long
             IndoorwayPosition indoorwayPosition = IndoorwayLocationSdk.instance().position().latest();
