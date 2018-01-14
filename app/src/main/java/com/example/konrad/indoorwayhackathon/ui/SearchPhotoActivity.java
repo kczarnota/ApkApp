@@ -122,6 +122,8 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
             }
         };
         handler.post(runnable);
+
+        randomNum = ThreadLocalRandom.current().nextInt(0, 2);
     }
 
     @Override
