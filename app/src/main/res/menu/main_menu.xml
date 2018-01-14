@@ -6,6 +6,9 @@
     <item
         android:id="@+id/pritip_activity_menu"
         android:title="Protips" />
+    <item
+        android:id="@+id/quict_navigation_menu_item"
+        android:title="Quick Seach" />
 </menu>
 
 

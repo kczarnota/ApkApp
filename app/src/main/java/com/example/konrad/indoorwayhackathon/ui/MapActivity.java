@@ -310,9 +310,17 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             case R.id.pritip_activity_menu:
                 startProtipActivity();
                 return true;
+            case R.id.quict_navigation_menu_item:
+                startQuickNavigation();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void startQuickNavigation() {
+        Intent intent = new Intent(this, QuickNavigationActivity.class);
+        startActivity(intent);
     }
 
     private void startProtipActivity() {
