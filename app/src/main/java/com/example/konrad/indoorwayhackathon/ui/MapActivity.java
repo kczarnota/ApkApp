@@ -103,12 +103,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                         }
                     }).execute();*/
 
-                    for (String uuid : renderedVisitors) {
-                        visitorLayer.remove(uuid);
-                    }
-
-                    renderedVisitors.clear();
-
                     for (Map.Entry<RegisteredVisitor, VisitorLocation> visitor : visitorLocations.entrySet()) {
                         VisitorLocation location = visitor.getValue();
                         RegisteredVisitor v = visitor.getKey();
@@ -120,8 +114,6 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                                     position.getCoordinates(),
                                     v.getName(),
                                     2));
-                        } else {
-                            visitorLayer.remove(location.getVisitorUuid());
                         }
                     }
                 }

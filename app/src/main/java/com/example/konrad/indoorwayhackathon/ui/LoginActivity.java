@@ -39,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         setTitle("Login to App");
     }
 
-    public void doLogin(View view) throws IOException {
+    public void doLogin(final View view) throws IOException {
         final String loginName = loginField.getText().toString();
         String password = passwordField.getText().toString();
 

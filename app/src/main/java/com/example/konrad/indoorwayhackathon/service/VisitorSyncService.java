@@ -85,7 +85,7 @@ public class VisitorSyncService extends Service
     private void getVisitorsNow(List <VisitorLocation> visitorLocations) {
         final List <VisitorLocation> visitorLocationLinkedList = new LinkedList<>();
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, -10);
+        calendar.add(Calendar.MINUTE, -1);
         Date fiveMinutesAgo = calendar.getTime();
         for (VisitorLocation location : visitorLocations) {
             if (location.getTimestamp() != null && !location.getTimestamp().before(fiveMinutesAgo))

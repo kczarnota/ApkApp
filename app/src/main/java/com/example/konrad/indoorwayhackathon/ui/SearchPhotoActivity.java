@@ -1,9 +1,13 @@
 package com.example.konrad.indoorwayhackathon.ui;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -84,7 +88,7 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
         eventListenter = new Action1<IndoorwayProximityEvent>() {
             @Override
             public void onAction(IndoorwayProximityEvent indoorwayProximityEvent) {
-                Toast.makeText(SearchPhotoActivity.this, "item collected", Toast.LENGTH_SHORT).show();
+
                 visitorLayer.remove(indoorwayProximityEvent.getIdentifier());
                 IndoorwayLocationSdk.instance().customProximityEvents().remove(indoorwayProximityEvent.getIdentifier());
                 ApiService api = Api.getApi();
@@ -104,6 +108,8 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
 
                     }
                 });
+
+                createDialog().show();
             }
         };
 
@@ -114,7 +120,6 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                 try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
                     if (pos != null) {
                         Coordinates cor = pos.getCoordinates();
-                        //visitorLayer.remove("me1");
                         visitorLayer.add(
                                 new DrawableIcon(
                                         "me1",   // icon identifier
@@ -176,8 +181,6 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                                 new Coordinates(quest.localization.latitude, quest.localization.longitude),
                                 quest.name,
                                 2));
-                        Toast.makeText(SearchPhotoActivity.this, "putting item in" +
-                                quest.localization.latitude + " " + quest.localization.longitude, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -211,4 +214,19 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                 .onEvent()
                 .register(eventListenter);
     }
+
+    private Dialog createDialog() {
+        // Use the Builder class for convenient dialog construction
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.dialog_collected_missiles)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(getApplicationContext(), MapActivity.class);
+                        startActivity(intent);
+                    }
+                });
+        // Create the AlertDialog object and return it
+        return builder.create();
+    }
+
 }
