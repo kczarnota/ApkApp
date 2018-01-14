@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.example.konrad.indoorwayhackathon.R;
 import com.example.konrad.indoorwayhackathon.Utils;
@@ -52,11 +53,15 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
     public TextView mRewardTextView;
     @BindView(R.id.quest_icon)
     public ImageView mQuestIcon;
+    @BindView(R.id.name)
+    public TextView placeName;
 
     private Action1<IndoorwayProximityEvent> eventListenter;
     private MarkersLayer visitorLayer;
     private Handler handler;
     private Runnable runnable;
+    private int randomNum;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,7 +88,7 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
             }
         });
 
-
+        randomNum = ThreadLocalRandom.current().nextInt(0, 2);
 
         eventListenter = new Action1<IndoorwayProximityEvent>() {
             @Override
@@ -159,8 +164,14 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                     public void onResponse(Call<Quest> call, Response<Quest> response)
                     {
                         Quest quest = response.body();
-                        String path = "http://192.168.100.194:8080/resources/image?name=" + quest.imageName;
-                        Picasso.with(getApplicationContext()).load(path).into(mQuestIcon);
+                        if (randomNum == 0)
+                        {
+                            String path = "http://192.168.100.194:8080/resources/image?name=" + quest.imageName;
+                            Picasso.with(getApplicationContext()).load(path).into(mQuestIcon);
+                        } else {
+                            mQuestIcon.setImageDrawable(getDrawable(R.drawable.q_mark));
+                            placeName.setText(quest.name);
+                        }
                         mRewardTextView.setText(String.valueOf(quest.value));
 
                         IndoorwayLocationSdk.instance().customProximityEvents()
@@ -226,7 +237,7 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                     }
                 });
         // Create the AlertDialog object and return it
+        builder.setCancelable(false);
         return builder.create();
     }
-
 }
