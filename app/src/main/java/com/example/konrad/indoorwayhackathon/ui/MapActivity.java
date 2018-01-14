@@ -343,7 +343,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     void playNoteDuringTime(final byte pitch, final long miliseconds) {
         new Thread(new Runnable() {
             public void run() {
-                for (int i = 0; i < miliseconds; i++) {
+                for (int i = 0; i < 10; i++) {
                     byte[] playNote;
                     playNote = new byte[3];
                     playNote[0] = (byte) (0x90 | 0x00);  // 0x90 = note On, 0x00 = channel 1
@@ -351,7 +351,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                     playNote[2] = (byte) 0x7F;  // 0x7F = the maximum velocity (127)
                     midiDriver.queueEvent(playNote);
                     try {
-                        Thread.sleep(10);
+                        Thread.sleep(miliseconds);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -383,8 +383,8 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                         @Override
                         public void onAction(IndoorwayPosition indoorwayPosition) {
                             double distance = indoorwayPosition.getCoordinates().getDistanceTo(new Coordinates(i.localization.latitude, i.localization.longitude));
-                            if (distance < 10) {
-                                playNoteDuringTime((byte) 0x54, (long) (10 - distance) * 10);
+                            if (distance < 5) {
+                                playNoteDuringTime((byte) 0x54, (long) distance * 10);
                                 return;
                             }
 
@@ -434,12 +434,11 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         ApiService apiService = Api.getApi();
         Map<String, String> map = new HashMap<>();
         map.put("Authorization", "Bearer " + Utils.getToken());
-        apiService.getSubjects(map).enqueue(new Callback<Subjects>(){
+        apiService.getSubjects(map).enqueue(new Callback<Subjects>() {
             @Override
-            public void onResponse(Call<Subjects> call, Response<Subjects> response)
-            {
+            public void onResponse(Call<Subjects> call, Response<Subjects> response) {
                 List<Subject> subjects = response.body().list;
-                for(Subject s : subjects) {
+                for (Subject s : subjects) {
                     visitorLayer.add(new DrawableCircle(
                             s.name, 3.5f, Utils.getRandomColor(), new Coordinates(s.localization.latitude,
                             s.localization.longitude)));
@@ -449,8 +448,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
             }
 
             @Override
-            public void onFailure(Call<Subjects> call, Throwable t)
-            {
+            public void onFailure(Call<Subjects> call, Throwable t) {
 
             }
         });
