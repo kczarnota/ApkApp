@@ -1,6 +1,10 @@
 package com.example.konrad.indoorwayhackathon;
 
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 public class Utils
 {
     public static final String APP_TAG = "IndoorwayHackathon";
@@ -13,15 +17,18 @@ public class Utils
 
     public static String token;
 
-    public static String getTag(String classTag) {
+    public static String getTag(String classTag)
+    {
         return APP_TAG + " " + classTag;
     }
 
-    public static void setToken(String t) {
+    public static void setToken(String t)
+    {
         token = t;
     }
 
-    public static String getToken() {
+    public static String getToken()
+    {
         return token;
     }
 }

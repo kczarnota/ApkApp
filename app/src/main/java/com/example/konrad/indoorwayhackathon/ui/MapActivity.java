@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -42,8 +45,10 @@ import com.indoorway.android.common.sdk.model.proximity.IndoorwayProximityEventS
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
+import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -72,9 +77,11 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     private Action1<IndoorwayProximityEvent> eventListenter;
     private double mLat;
     private double mLon;
+    private Handler handler;
+    private Runnable runnable;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection()
+    /*private ServiceConnection serviceConnection = new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder)
@@ -89,7 +96,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                     if (currentMap == null)
                         return;
 
-                    /*IndoorwaySdk.instance().visitors().list().setOnCompletedListener(new Action1<List<RegisteredVisitor>>()
+                    *//*IndoorwaySdk.instance().visitors().list().setOnCompletedListener(new Action1<List<RegisteredVisitor>>()
                     {
                         @Override
                         public void onAction(List<RegisteredVisitor> registeredVisitors)
@@ -102,7 +109,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                                     Log.d(TAG, "onAction: " + vis.getName());
                             }
                         }
-                    }).execute();*/
+                    }).execute();*//*
 
                     for (Map.Entry<RegisteredVisitor, VisitorLocation> visitor : visitorLocations.entrySet())
                     {
@@ -134,7 +141,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         {
 
         }
-    };
+    };*/
 
 
     @Override
@@ -147,6 +154,30 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
 
         this.renderedVisitors = new LinkedList<>();
 
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {IndoorwayPosition pos = IndoorwayLocationSdk.instance().position().latest();
+                    if (pos != null) {
+                        Coordinates cor = pos.getCoordinates();
+                        visitorLayer.add(
+                                new DrawableIcon(
+                                        "me1",   // icon identifier
+                                        "me", // texture identifier
+                                        cor,
+                                        3f,  // icon size vertically
+                                        3f   // icon size horizontally
+                                )
+                        );
+                    }
+                } catch (Exception e) {
+                } finally {
+                    handler.postDelayed(runnable, 100);
+                }
+            }
+        };
+        handler.post(runnable);
 
         eventListenter = new Action1<IndoorwayProximityEvent>()
         {
@@ -218,7 +249,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                 .register(eventListenter);
     }
 
-    @Override
+/*    @Override
     protected void onStart()
     {
         super.onStart();
@@ -231,7 +262,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
     {
         unbindService(serviceConnection);
         super.onStop();
-    }
+    }*/
 
     @Override
     public void onMapFragmentReady(MapFragment mapFragment)
@@ -248,6 +279,8 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                     Log.d(TAG, "onMapFragmentReady: not null");
                 }
                 prepareHiddenPoints();
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
+                visitorLayer.registerTexture(new BitmapTexture("me", bitmap));
             }
         });
 

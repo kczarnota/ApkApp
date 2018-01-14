@@ -181,7 +181,7 @@ public class SearchPhotoActivity extends AppCompatActivity implements IndoorwayM
                     }
                 });
 
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.trol);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
                 visitorLayer.registerTexture(new BitmapTexture("me", bitmap));
             }
         });
