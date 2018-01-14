@@ -28,5 +28,8 @@ public interface ApiService {
 
     @GET("/api/user/add/coin")
     Call<Void> postAdditionalPoints(@HeaderMap Map<String, String> headers, @Query("value") String value);
+
+    @GET("/api/subject/2")
+    Call<Subjects> getSubjects(@HeaderMap Map<String, String> headers);
 }
 

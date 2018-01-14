@@ -4,6 +4,9 @@ package com.example.konrad.indoorwayhackathon;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils
 {
@@ -14,6 +17,8 @@ public class Utils
     public static final String SECOND_FLOOR_UUID = "3-_M01M3r5w";
 
     public static final String TOKEN_KEY = "token";
+
+    public static int[] COLORS = {Color.RED, Color.GREEN, Color.BLACK, Color.CYAN, Color.MAGENTA};
 
     public static String token;
 
@@ -30,5 +35,9 @@ public class Utils
     public static String getToken()
     {
         return token;
+    }
+
+    public static int getRandomColor() {
+        return COLORS[ThreadLocalRandom.current().nextInt(0, COLORS.length)];
     }
 }

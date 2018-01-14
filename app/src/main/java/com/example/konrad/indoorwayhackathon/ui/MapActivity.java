@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -28,6 +29,8 @@ import com.example.konrad.indoorwayhackathon.net.login.Api;
 import com.example.konrad.indoorwayhackathon.net.login.ApiService;
 import com.example.konrad.indoorwayhackathon.net.login.Item;
 import com.example.konrad.indoorwayhackathon.net.login.ItemsList;
+import com.example.konrad.indoorwayhackathon.net.login.Subject;
+import com.example.konrad.indoorwayhackathon.net.login.Subjects;
 import com.example.konrad.indoorwayhackathon.service.SyncListener;
 import com.example.konrad.indoorwayhackathon.service.VisitorBinder;
 import com.example.konrad.indoorwayhackathon.service.VisitorSyncService;
@@ -45,7 +48,9 @@ import com.indoorway.android.common.sdk.model.proximity.IndoorwayProximityEventS
 import com.indoorway.android.fragments.sdk.map.IndoorwayMapFragment;
 import com.indoorway.android.fragments.sdk.map.MapFragment;
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawableCircle;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableIcon;
+import com.indoorway.android.map.sdk.view.drawable.figures.DrawablePolygon;
 import com.indoorway.android.map.sdk.view.drawable.figures.DrawableText;
 import com.indoorway.android.map.sdk.view.drawable.layers.MarkersLayer;
 import com.indoorway.android.map.sdk.view.drawable.textures.BitmapTexture;
@@ -279,6 +284,7 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
                     Log.d(TAG, "onMapFragmentReady: not null");
                 }
                 prepareHiddenPoints();
+                prepareSubjects();
                 Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.profile);
                 visitorLayer.registerTexture(new BitmapTexture("me", bitmap));
             }
@@ -383,6 +389,32 @@ public class MapActivity extends AppCompatActivity implements IndoorwayMapFragme
         // Create the AlertDialog object and return it
         builder.setCancelable(false);
         return builder.create();
+    }
+
+    private void prepareSubjects() {
+        ApiService apiService = Api.getApi();
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Bearer " + Utils.getToken());
+        apiService.getSubjects(map).enqueue(new Callback<Subjects>(){
+            @Override
+            public void onResponse(Call<Subjects> call, Response<Subjects> response)
+            {
+                List<Subject> subjects = response.body().list;
+                for(Subject s : subjects) {
+                    visitorLayer.add(new DrawableCircle(
+                            s.name, 3.5f, Utils.getRandomColor(), new Coordinates(s.localization.latitude,
+                            s.localization.longitude)));
+                    visitorLayer.add(new DrawableText(s.name, new Coordinates(
+                            s.localization.latitude, s.localization.longitude), s.name, 1.5f));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Subjects> call, Throwable t)
+            {
+
+            }
+        });
     }
 }
 
