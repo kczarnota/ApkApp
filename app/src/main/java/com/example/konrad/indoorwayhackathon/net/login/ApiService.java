@@ -26,7 +26,7 @@ public interface ApiService {
     @GET("/api/user/get/coin/")
     Call<Integer> getCoins(@HeaderMap Map<String, String> headers);
 
-    @GET("/api/user/add/coin")
-    Call<Void> postAdditionalPoints(@HeaderMap Map<String, String> headers, @Query("value") String value);
+    @POST("/api/user/add/coin")
+    Call<Void> postAdditionalPoints(@HeaderMap Map<String, String> headers, @Field("value") String value);
 }
 
