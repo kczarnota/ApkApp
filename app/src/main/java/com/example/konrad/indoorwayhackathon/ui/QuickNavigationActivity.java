@@ -3,7 +3,6 @@ package com.example.konrad.indoorwayhackathon.ui;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,7 +18,6 @@ import com.indoorway.android.common.sdk.model.IndoorwayPosition;
 import com.indoorway.android.location.sdk.IndoorwayLocationSdk;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -42,7 +40,7 @@ public class QuickNavigationActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         items = new ArrayList<>();
-        adapter = new QuickNavItemsListAdapter(QuickNavigationActivity.this, R.layout.pritip_list_item, items);
+        adapter = new QuickNavItemsListAdapter(QuickNavigationActivity.this, R.layout.distance_list_item, items);
         quickNavTargesList.setAdapter(adapter);
 
         quickNavTargesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
